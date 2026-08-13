@@ -82,7 +82,7 @@ export default function LoginScreen() {
             C
           </div>
           <span className="font-semibold tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            Classline
+            Get Studious
           </span>
         </div>
 
