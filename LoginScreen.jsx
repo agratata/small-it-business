@@ -1,13 +1,23 @@
 import React, { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, User, MessageCircle, ArrowRight } from "lucide-react";
+import { createClient } from "@supabase/supabase-js";
+import { Mail, Lock, Eye, EyeOff, User, MessageCircle, ArrowRight, GraduationCap } from "lucide-react";
+
+// Reads from your environment — set these in .env.local (Vite) as
+// VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, or swap for your
+// framework's equivalent env-var convention.
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 const COURSE_TAGS = ["COMP301", "chat", "MATH210", "assignments", "BIOL110", "office hrs"];
 
-export default function LoginScreen() {
+export default function LoginScreen({ onAuthSuccess }) {
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [showPassword, setShowPassword] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "student" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const isUniEmail = (email) => {
@@ -16,28 +26,61 @@ export default function LoginScreen() {
     return email.includes("@") && domain.includes(".") && !freeProviders.includes(domain);
   };
 
-  const handleSubmit = (e) => {
+  const validate = () => {
+    if (mode === "signup" && form.name.trim().length < 2) return "Enter your full name.";
+    if (!form.email.trim()) return "Enter your university email.";
+    if (!isUniEmail(form.email.trim())) return "Use your university email address, not a personal one.";
+    if (form.password.length < 6) return "Password must be at least 6 characters.";
+    return "";
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (mode === "signup" && form.name.trim().length < 2) {
-      setError("Enter your full name.");
-      return;
-    }
-    if (!form.email.trim()) {
-      setError("Enter your university email.");
-      return;
-    }
-    if (!isUniEmail(form.email.trim())) {
-      setError("Use your university email address, not a personal one.");
-      return;
-    }
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
-    setSubmitted(true);
+    setLoading(true);
+
+    try {
+      if (mode === "signup") {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: form.email.trim(),
+          password: form.password,
+        });
+        if (signUpError) throw signUpError;
+
+        // Create the matching profiles row. If email confirmation is on,
+        // data.user exists but the session is null until they confirm —
+        // the insert still works because it runs as that user's own id.
+        if (data.user) {
+          const { error: profileError } = await supabase.from("profiles").insert({
+            id: data.user.id,
+            full_name: form.name.trim(),
+            email: form.email.trim(),
+            role: form.role,
+          });
+          if (profileError) throw profileError;
+        }
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: form.email.trim(),
+          password: form.password,
+        });
+        if (signInError) throw signInError;
+      }
+
+      setSubmitted(true);
+      onAuthSuccess?.();
+    } catch (err) {
+      setError(err.message || "Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,7 +122,7 @@ export default function LoginScreen() {
             className="w-8 h-8 rounded-md flex items-center justify-center font-bold text-sm"
             style={{ background: "#C9F158", color: "#1B1D3A" }}
           >
-            C
+            G
           </div>
           <span className="font-semibold tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Get Studious
@@ -176,12 +219,14 @@ export default function LoginScreen() {
                 {mode === "signup" ? "Account created" : "Welcome back"}
               </h2>
               <p className="text-sm" style={{ color: "#6B6C87" }}>
-                {mode === "signup" ? "You can now join your course spaces." : "Redirecting you to your course spaces."}
+                {mode === "signup"
+                  ? "Check your inbox to confirm your email, then log in."
+                  : "Redirecting you to your course spaces."}
               </p>
               <button
                 onClick={() => {
                   setSubmitted(false);
-                  setForm({ name: "", email: "", password: "" });
+                  setForm({ name: "", email: "", password: "", role: "student" });
                 }}
                 className="mt-6 text-sm underline"
                 style={{ color: "#5B4EFF" }}
@@ -205,24 +250,50 @@ export default function LoginScreen() {
 
               <form onSubmit={handleSubmit} noValidate>
                 {mode === "signup" && (
-                  <div className="mb-4">
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: "#3D3E5C" }}>
-                      Full name
-                    </label>
-                    <div className="relative">
-                      <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2" color="#9FA0B8" />
-                      <input
-                        type="text"
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        placeholder="Amara Okafor"
-                        className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition"
-                        style={{ border: "1px solid #E4E3DB", background: "#fff", color: "#1B1D3A" }}
-                        onFocus={(e) => (e.target.style.borderColor = "#5B4EFF")}
-                        onBlur={(e) => (e.target.style.borderColor = "#E4E3DB")}
-                      />
+                  <>
+                    <div className="mb-4">
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: "#3D3E5C" }}>
+                        Full name
+                      </label>
+                      <div className="relative">
+                        <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2" color="#9FA0B8" />
+                        <input
+                          type="text"
+                          value={form.name}
+                          onChange={(e) => setForm({ ...form, name: e.target.value })}
+                          placeholder="Amara Okafor"
+                          className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition"
+                          style={{ border: "1px solid #E4E3DB", background: "#fff", color: "#1B1D3A" }}
+                          onFocus={(e) => (e.target.style.borderColor = "#5B4EFF")}
+                          onBlur={(e) => (e.target.style.borderColor = "#E4E3DB")}
+                        />
+                      </div>
                     </div>
-                  </div>
+
+                    <div className="mb-4">
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: "#3D3E5C" }}>
+                        I am a
+                      </label>
+                      <div className="flex gap-2">
+                        {["student", "lecturer"].map((r) => (
+                          <button
+                            type="button"
+                            key={r}
+                            onClick={() => setForm({ ...form, role: r })}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm capitalize transition"
+                            style={{
+                              border: form.role === r ? "1px solid #1B1D3A" : "1px solid #E4E3DB",
+                              background: form.role === r ? "#1B1D3A" : "#fff",
+                              color: form.role === r ? "#F2F1EA" : "#5B5D7A",
+                            }}
+                          >
+                            <GraduationCap size={14} />
+                            {r}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 <div className="mb-4">
@@ -279,13 +350,14 @@ export default function LoginScreen() {
 
                 <button
                   type="submit"
+                  disabled={loading}
                   className="w-full mt-5 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition"
-                  style={{ background: "#1B1D3A", color: "#F2F1EA" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#2A2C54")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "#1B1D3A")}
+                  style={{ background: "#1B1D3A", color: "#F2F1EA", opacity: loading ? 0.7 : 1 }}
+                  onMouseEnter={(e) => !loading && (e.currentTarget.style.background = "#2A2C54")}
+                  onMouseLeave={(e) => !loading && (e.currentTarget.style.background = "#1B1D3A")}
                 >
-                  {mode === "login" ? "Log in" : "Create account"}
-                  <ArrowRight size={15} />
+                  {loading ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
+                  {!loading && <ArrowRight size={15} />}
                 </button>
               </form>
 
@@ -301,6 +373,10 @@ export default function LoginScreen() {
                 >
                   {mode === "login" ? "Create an account" : "Log in"}
                 </button>
+              </p>
+
+              <p className="text-center text-xs mt-8 leading-relaxed" style={{ color: "#B0B1C4" }}>
+                This website/app is for a class assignment and not for commercial use.
               </p>
             </>
           )}
