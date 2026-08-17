@@ -4,7 +4,8 @@ import "./LandingPage.css";
 const BUSINESS = {
   name: "Get Studious",
   abn: "42 683 197 054",
-  email: "hello@getstudious.com.au",
+  acn: "90 568 340 004",
+  email: "admin@getstudious.com.au",
   phone: "+61 3 9000 4821",
   socialUrl: "https://x.com/getstudiouss",
   socialHandle: "@getstudiouss",
