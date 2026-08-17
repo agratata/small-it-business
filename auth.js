@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { findInstitutionByEmail } from './institutions'
 
 const FREE_EMAIL_PROVIDERS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"];
 
