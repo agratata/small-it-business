@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { onAuthStateChange, getCurrentUser, signOut } from "./auth";
+import LandingPage from "./LandingPage";
 import LoginScreen from "./LoginScreen";
 import CourseSpaceList from "./CourseSpaceList";
 import ChatView from "./ChatView";
@@ -8,6 +9,10 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loadingSession, setLoadingSession] = useState(true);
   const [openCourseId, setOpenCourseId] = useState(null);
+
+  // Logged-out visitors see the public landing page first. This flips to
+  // true when they click "Log in" or "Create an account" on it.
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     getCurrentUser().then((u) => {
@@ -18,7 +23,10 @@ export default function App() {
     // Fires on login, logout, and token refresh (including in other tabs).
     const { data: sub } = onAuthStateChange((u) => {
       setUser(u);
-      if (!u) setOpenCourseId(null);
+      if (!u) {
+        setOpenCourseId(null);
+        setShowLogin(false); // signing out returns you to the landing page
+      }
     });
 
     return () => sub?.subscription?.unsubscribe();
@@ -26,7 +34,10 @@ export default function App() {
 
   if (loadingSession) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "#FAFAF7" }}>
+      <div
+        className="min-h-screen w-full flex items-center justify-center"
+        style={{ background: "#FAFAF7" }}
+      >
         <p className="text-sm" style={{ color: "#6B6C87" }}>
           Loading…
         </p>
@@ -35,7 +46,21 @@ export default function App() {
   }
 
   if (!user) {
-    return <LoginScreen onAuthSuccess={() => {}} />;
+    if (showLogin) {
+      return (
+        <LoginScreen
+          onAuthSuccess={() => {}}
+          onBack={() => setShowLogin(false)}
+        />
+      );
+    }
+
+    return (
+      <LandingPage
+        onLogin={() => setShowLogin(true)}
+        onSignUp={() => setShowLogin(true)}
+      />
+    );
   }
 
   // Role/full name were stored as auth metadata at signup time (see
@@ -44,7 +69,13 @@ export default function App() {
   const role = user.user_metadata?.role || "student";
 
   if (openCourseId) {
-    return <ChatView courseId={openCourseId} userId={user.id} onBack={() => setOpenCourseId(null)} />;
+    return (
+      <ChatView
+        courseId={openCourseId}
+        userId={user.id}
+        onBack={() => setOpenCourseId(null)}
+      />
+    );
   }
 
   return (
