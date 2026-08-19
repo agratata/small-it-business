@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Instrument+Sans:wght@400..600&family=JetBrains+Mono:wght@400;500&display=swap');
 
+/* Every class is prefixed gs- so nothing here collides with App.css / index.css */
 
 .gs-page {
   --gs-ink: #17202b;
@@ -8,7 +9,7 @@
   --gs-card: #ffffff;
   --gs-line: #dde4ea;
   --gs-highlight: #ffe45e;
-  --gs-lecturer: #1f6b5f;
+  --gs-lecturer: #0e766d;
 
   --gs-display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
   --gs-body: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
@@ -58,6 +59,9 @@
 }
 
 .gs-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
   font-family: var(--gs-display);
   font-weight: 800;
   font-size: 20px;
@@ -1227,6 +1231,28 @@
 
 .gs-wordmark-sm {
   font-size: 15px;
+  gap: 9px;
+}
+
+.gs-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: block;
+  flex: none;
+}
+
+.gs-wordmark-sm .gs-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+}
+
+@media (max-width: 660px) {
+  .gs-logo {
+    width: 30px;
+    height: 30px;
+  }
 }
 
 .gs-footer-note {

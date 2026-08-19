@@ -2,17 +2,19 @@ import { useState } from "react";
 import "./LandingPage.css";
 
 const BUSINESS = {
-  name: "Get Studious",
+  name: "Get Studious Pty Ltd",
   abn: "42 683 197 054",
-  acn: "90 568 340 004",
-  email: "admin@getstudious.com.au",
+  acn: "683 197 054",
+  email: "hello@getstudious.com.au",
   phone: "+61 3 9000 4821",
   socialUrl: "https://x.com/getstudiouss",
   socialHandle: "@getstudiouss",
   paypalMe: "https://www.paypal.me/getstudiouss",
 };
 
-
+/* -------------------------------------------------------------- *
+ * Services
+ * -------------------------------------------------------------- */
 const SERVICES = [
   {
     title: "Course spaces",
@@ -76,7 +78,9 @@ const SERVICES = [
   },
 ];
 
-
+/* -------------------------------------------------------------- *
+ * Pricing
+ * -------------------------------------------------------------- */
 const PLANS = [
   {
     id: "pilot",
@@ -87,7 +91,7 @@ const PLANS = [
     features: [
       "Up to 3 course spaces",
       "Full group chat and announcements",
-      "Ends on its own so there's nothing to cancel",
+      "Ends on its own — nothing to cancel",
     ],
     action: "signup",
     cta: "Start a pilot",
@@ -146,6 +150,9 @@ const QUOTES = [
   },
 ];
 
+/* -------------------------------------------------------------- *
+ * Small pieces
+ * -------------------------------------------------------------- */
 
 function ServiceIcon({ children }) {
   return (
@@ -188,6 +195,9 @@ function TickIcon() {
   );
 }
 
+/* -------------------------------------------------------------- *
+ * Main component
+ * -------------------------------------------------------------- */
 
 export default function LandingPage({ onLogin = () => {}, onSignUp = () => {} }) {
   const [view, setView] = useState("home");
@@ -210,8 +220,9 @@ export default function LandingPage({ onLogin = () => {}, onSignUp = () => {} })
 
   return (
     <div className="gs-page">
-      <header className="gs-nav" background = "">
+      <header className="gs-nav">
         <button type="button" className="gs-wordmark" onClick={() => showHome()}>
+          <img className="gs-logo" src="/logo-tile.png" alt="" />
           Get Studious
         </button>
 
@@ -291,7 +302,7 @@ function HomeView({ onLogin, onSignUp, onContact }) {
 
           <p className="gs-lede">
             Lecturers create a course space. Students join with a code. Questions,
-            announcements and study plans for that subject all stay in one thread
+            announcements and study plans for that subject all stay in one thread —
             instead of scattered across six group chats.
           </p>
 
@@ -305,7 +316,7 @@ function HomeView({ onLogin, onSignUp, onContact }) {
           </div>
 
           <p className="gs-fineprint">
-            Sign up with your email and pick lecturer or student when you do.
+            Sign up with your email — pick lecturer or student when you do.
           </p>
         </div>
 
@@ -391,7 +402,7 @@ function HomeView({ onLogin, onSignUp, onContact }) {
             <span className="gs-step-num">04</span>
             <h3 className="gs-step-title">The subject talks in one place</h3>
             <p className="gs-step-text">
-              Ask once, where everyone can see the answer (including the lecturer).
+              Ask once, where everyone can see the answer — including the lecturer.
             </p>
           </li>
         </ol>
@@ -423,11 +434,11 @@ function HomeView({ onLogin, onSignUp, onContact }) {
         <div className="gs-promo-inner">
           <span className="gs-promo-tag">Semester 2 offer</span>
           <h2 className="gs-promo-title">
-            The first 10 institutions get <span className="gs-highlight" WebkitTextStroke= '2px black' >a free semester</span>
+            The first 10 institutions get <span className="gs-highlight gs-highlight">a free semester</span>
           </h2>
           <p className="gs-promo-text">
             Run a pilot across up to three subjects before 30 September. Nothing to pay
-            and no invoice raised. If it works for your staff, the subscription starts
+            and no invoice raised — if it works for your staff, the subscription starts
             next semester.
           </p>
           <div className="gs-cta-row gs-cta-row-flush">
@@ -460,10 +471,11 @@ function HomeView({ onLogin, onSignUp, onContact }) {
       {/* ---------- pricing + PayPal ---------- */}
       <section className="gs-pricing" id="pricing">
         <p className="gs-eyebrow">Pricing</p>
-        <h2 className="gs-h2 gs-h2-tight">Billing to the University</h2>
+        <h2 className="gs-h2 gs-h2-tight">The institution pays. Nobody else does.</h2>
         <p className="gs-section-lede">
           One subscription covers every lecturer and every student at your university.
-          Staff and students sign in with their institution email.
+          Staff and students sign in with their institution email — there is nothing for
+          them to buy, and no seats to count.
         </p>
 
         <ul className="gs-plan-list">
@@ -593,7 +605,7 @@ function ContactPage() {
       return;
     }
     if (form.message.trim().length < 10) {
-      setError("Tell us a bit more; at least a sentence.");
+      setError("Tell us a bit more — at least a sentence.");
       return;
     }
     setError("");
@@ -623,7 +635,7 @@ function ContactPage() {
               </span>
               <h2 className="gs-sent-title">Message sent</h2>
               <p className="gs-sent-text">
-                Thanks {form.name.split(" ")[0]} ! we will reply to {form.email} within one
+                Thanks {form.name.split(" ")[0]} — we will reply to {form.email} within one
                 business day.
               </p>
               <button
@@ -649,7 +661,7 @@ function ContactPage() {
                 className="gs-input"
                 value={form.name}
                 onChange={(event) => update("name", event.target.value)}
-                placeholder="Tommy"
+                placeholder="Agrata"
               />
 
               <label className="gs-label" htmlFor="gs-email">
@@ -767,7 +779,10 @@ function SiteFooter({ onNavigate, onContact }) {
     <footer className="gs-footer">
       <div className="gs-footer-grid">
         <div className="gs-footer-brand">
-          <span className="gs-wordmark gs-wordmark-sm">Get Studious</span>
+          <span className="gs-wordmark gs-wordmark-sm">
+            <img className="gs-logo" src="/logo-tile.png" alt="" />
+            Get Studious
+          </span>
           <p className="gs-footer-blurb">
             One space per subject. Chat, files and announcements for Australian
             universities.

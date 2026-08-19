@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Mail, Lock, Eye, EyeOff, User, MessageCircle, ArrowRight, GraduationCap } from "lucide-react";
-
+import Logo from './Logo'
 // Reads from your environment — set these in .env.local (Vite) as
 // VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, or swap for your
 // framework's equivalent env-var convention.
@@ -12,7 +12,7 @@ const supabase = createClient(
 
 const COURSE_TAGS = ["COMP301", "chat", "MATH210", "assignments", "BIOL110", "office hrs"];
 
-export default function LoginScreen({ onAuthSuccess }) {
+export default function LoginScreen({ onAuthSuccess, onBack }) {
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "student" });
@@ -118,14 +118,11 @@ export default function LoginScreen({ onAuthSuccess }) {
         style={{ background: "#1B1D3A", color: "#F2F1EA", minHeight: "360px" }}
       >
         <div className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-md flex items-center justify-center font-bold text-sm"
-            style={{ background: "#C9F158", color: "#1B1D3A" }}
-          >
-            G
+          <div className="flex justify-center mb-8">
+            <Logo size={56} onClick={onBack} />
           </div>
           <span className="font-semibold tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            Get Studious
+            
           </span>
         </div>
 
@@ -375,7 +372,7 @@ export default function LoginScreen({ onAuthSuccess }) {
                 </button>
               </p>
 
-              <p className="text-center text-xs mt-8 leading-relaxed" style={{ color: "#B0B1C4" }}>
+              <p className="text-center text-xs mt-8 leading-relaxed" style={{ color: "#FFFFFF", backgroundColor : "#FF000D" }}>
                 This website/app is for a class assignment and not for commercial use.
               </p>
             </>
