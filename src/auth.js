@@ -9,11 +9,11 @@ export function isUniversityEmail(email) {
 
 // Creates an auth user AND, via the DB trigger in the schema, a matching
 // row in `profiles` with the name/role passed in metadata.
-export async function signUp({ fullName, email, password, role = "student" }) {
+export async function signUp({ fullName, email, password, role }) {
   if (!isUniversityEmail(email)) {
     return { error: { message: "Use your university email address, not a personal one." } };
   }
-
+  const institution = await findInstitutionByEmail(email)
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -21,6 +21,7 @@ export async function signUp({ fullName, email, password, role = "student" }) {
       data: {
         full_name: fullName,
         role, // "student" or "lecturer"
+        institution_id: institution?.id ?? null,
       },
     },
   });
